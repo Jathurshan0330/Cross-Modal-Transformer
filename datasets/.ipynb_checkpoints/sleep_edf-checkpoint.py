@@ -11,7 +11,7 @@ from torch.utils.data import Dataset, DataLoader
 import os
 import glob
 import os
-
+import matplotlib.pyplot as plt
 def split_data(data_list,train_list,val_list):
     data_list = np.array(data_list)
     train_data_list = data_list[train_list]
@@ -194,6 +194,10 @@ class SleepEDF_Seq_MultiChan_Dataset(Dataset):
     
 
 def get_dataset(device,args):
+    args.train_data_list = list(args.train_data_list[0])
+    args.train_data_list = [ int(x) for x in args.train_data_list if x.isdigit() ]
+    args.val_data_list = list(args.val_data_list[0])
+    args.val_data_list = [ int(x) for x in args.val_data_list if x.isdigit() ]
     
     eeg_list = glob.glob(f'{args.data_path}/x*.h5')
     eeg_list.sort()
@@ -223,7 +227,26 @@ def get_dataset(device,args):
     label_list.sort()
     [train_label_list, val_label_list] = split_data(label_list,args.train_data_list,args.val_data_list)
     
-    if args.model_type = "Epoch":   # Dataset to train epoch transformer
+    print("Training Data Files: ===========================>")
+    print(train_eeg_list)
+    print(train_eog_list)
+    print(train_label_list)
+    print(train_mean_eeg_list)
+    print(train_sd_eeg_list)
+    print(train_mean_eog_list)
+    print(train_sd_eog_list)
+    
+    print("Validation Data Files: ===========================>")
+    print(val_eeg_list)
+    print(val_eog_list)
+    print(val_label_list)
+    print(val_mean_eeg_list)
+    print(val_sd_eeg_list)
+    print(val_mean_eog_list)
+    print(val_sd_eog_list)
+    
+    
+    if args.model_type == "Epoch":   # Dataset to train epoch transformer
            
         train_dataset = SleepEDF_MultiChan_Dataset(eeg_file = train_eeg_list , 
                                        eog_file = train_eog_list, 
@@ -247,5 +270,33 @@ def get_dataset(device,args):
         
         train_data_loader = data.DataLoader(train_dataset, batch_size = args.batch_size, shuffle = True)
         val_data_loader = data.DataLoader(val_dataset, batch_size = args.batch_size, shuffle = True)
-    
+        
+        eeg_data, eog_data, label = next(iter(train_data_loader))
+        print(f"EEG batch shape: {eeg_data.size()}")
+        print(f"EOG batch shape: {eog_data.size()}")
+        print(f"Labels batch shape: {label.size()}")
+
+        t = np.arange(0,30,1/100)
+        fig = plt.figure(figsize = (15,5))
+        plt.plot(t,eeg_data[0].squeeze(),label="EEG1")
+        plt.plot(t,eog_data[0].squeeze()+5,label="E0G")
+        plt.title(f"Label {label[0].squeeze()}")
+        plt.legend()
+        plt.show()
+        fig.savefig(os.path.join(args.project_path,"train_sample.png"))
+
+
+        eeg_data, eog_data, label = next(iter(val_data_loader))
+        print(f"EEG batch shape: {eeg_data.size()}")
+        print(f"EOG batch shape: {eog_data.size()}")
+        print(f"Labels batch shape: {label.size()}")
+
+        t = np.arange(0,30,1/100)
+        fig = plt.figure(figsize = (10,10))
+        plt.plot(t,eeg_data[0].squeeze())
+        plt.plot(t,eog_data[0].squeeze()+5)
+        plt.title(f"Label {label[0].squeeze()}")
+        plt.show()
+        fig.savefig(os.path.join(args.project_path,"val_sample.png"))
     return train_data_loader, val_data_loader
+
