@@ -14,6 +14,8 @@ from torch.nn import LayerNorm, BatchNorm1d
 from einops import rearrange, reduce, repeat
 from einops.layers.torch import Rearrange, Reduce
 import math
+
+
 def _get_clones(module, N):
     return ModuleList([copy.deepcopy(module) for i in range(N)])
 
