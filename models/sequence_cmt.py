@@ -11,7 +11,8 @@ from torch.nn.init import xavier_uniform_
 from torch.nn import Dropout
 from torch.nn import Linear
 from torch.nn import LayerNorm, BatchNorm1d
-
+from einops import rearrange, reduce, repeat
+from einops.layers.torch import Rearrange, Reduce
 from models.model_blocks import PositionalEncoding, Window_Embedding, Intra_modal_atten, Cross_modal_atten, Feed_forward
 
 class Epoch_Block(nn.Module):
