@@ -189,3 +189,63 @@ class SleepEDF_Seq_MultiChan_Dataset(Dataset):
         if self.target_transform:
             label = self.target_transform(label)
         return eeg_data, eog_data, label
+    
+    
+    
+
+def get_dataset(device,args):
+    
+    eeg_list = glob.glob(f'{args.data_path}/x*.h5')
+    eeg_list.sort()
+    [train_eeg_list, val_eeg_list] = split_data(eeg_list,args.train_data_list,args.val_data_list)
+
+    mean_eeg_list = glob.glob(f'{args.data_path}/mean*.h5')
+    mean_eeg_list.sort()
+    [train_mean_eeg_list, val_mean_eeg_list] = split_data(mean_eeg_list,args.train_data_list,args.val_data_list)
+
+    sd_eeg_list = glob.glob(f'{args.data_path}/std*.h5')
+    sd_eeg_list.sort()
+    [train_sd_eeg_list, val_sd_eeg_list] = split_data(sd_eeg_list,args.train_data_list,args.val_data_list)
+
+    eog_list = glob.glob(f'{args.data_path}/eog*.h5')
+    eog_list.sort()
+    [train_eog_list, val_eog_list] = split_data(eog_list,args.train_data_list,args.val_data_list)
+
+    mean_eog_list = glob.glob(f'{args.data_path}/eog_m*.h5')
+    mean_eog_list.sort()
+    [train_mean_eog_list, val_mean_eog_list] = split_data(mean_eog_list,args.train_data_list,args.val_data_list)
+
+    sd_eog_list = glob.glob(f'{args.data_path}/eog_s*.h5')
+    sd_eog_list.sort()
+    [train_sd_eog_list, val_sd_eog_list] = split_data(sd_eog_list,args.train_data_list,args.val_data_list)
+
+    label_list = glob.glob(f'{args.data_path}/y*.h5')
+    label_list.sort()
+    [train_label_list, val_label_list] = split_data(label_list,args.train_data_list,args.val_data_list)
+    
+    if args.model_type = "Epoch":   # Dataset to train epoch transformer
+           
+        train_dataset = SleepEDF_MultiChan_Dataset(eeg_file = train_eeg_list , 
+                                       eog_file = train_eog_list, 
+                                       label_file = train_label_list, 
+                                       device = device, mean_eeg_l = train_mean_eeg_list, sd_eeg_l = train_sd_eeg_list, 
+                                       mean_eog_l = train_mean_eog_list, sd_eog_l = train_sd_eog_list, 
+                                       sub_wise_norm = True, 
+                                       transform=transforms.Compose([
+                                           transforms.ToTensor(),
+                                            ]) )
+
+        val_dataset = SleepEDF_MultiChan_Dataset(eeg_file = val_eeg_list ,
+                                         eog_file = val_eog_list, 
+                                         label_file = val_label_list, 
+                                         device = device, mean_eeg_l = val_mean_eeg_list, sd_eeg_l = val_sd_eeg_list,
+                                         mean_eog_l = val_mean_eog_list, sd_eog_l = val_sd_eog_list,
+                                         sub_wise_norm = True,
+                                         transform=transforms.Compose([
+                                               transforms.ToTensor(),
+                                                ]) )
+        
+        train_data_loader = data.DataLoader(train_dataset, batch_size = args.batch_size, shuffle = True)
+        val_data_loader = data.DataLoader(val_dataset, batch_size = args.batch_size, shuffle = True)
+    
+    return train_data_loader, val_data_loader
