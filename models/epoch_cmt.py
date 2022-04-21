@@ -1,6 +1,22 @@
+import copy
+from typing import Optional, Any
+import torch
+import torch.nn as nn
+from torch import Tensor
+from torch.nn import functional as F
+from torch.nn import Module
+from torch.nn import MultiheadAttention
+from torch.nn import ModuleList
+from torch.nn.init import xavier_uniform_
+from torch.nn import Dropout
+from torch.nn import Linear
+from torch.nn import LayerNorm, BatchNorm1d
+
+from models.model_blocks import PositionalEncoding, Window_Embedding, Intra_modal_atten, Cross_modal_atten, Feed_forward
+
 class Epoch_Cross_Transformer_Network(nn.Module):
     def __init__(self,d_model = 64, dim_feedforward=512,window_size = 25): #  filt_ch = 4
-        super(Cross_Transformer_Network, self).__init__()
+        super(Epoch_Cross_Transformer_Network, self).__init__()
         
         self.eeg_atten = Intra_modal_atten(d_model=d_model, nhead=8, dropout=0.1,
                                             window_size =window_size, First = True )
