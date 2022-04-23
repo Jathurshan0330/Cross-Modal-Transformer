@@ -82,6 +82,6 @@ def plot_interpret(x,y,dydx,signal_type = "EEG", label = 0,save_path = None):
     axs[1].plot(x,y,linewidth = 2)
     axs[0].set_xlim(x.min(), x.max())
     axs[0].set_ylim(y.min()-1,y.max()+1)
-    plt.show()
+    # plt.show()
     if save_path:
         fig.savefig(os.path.join(save_path,f"{signal_type}_{label}"))
