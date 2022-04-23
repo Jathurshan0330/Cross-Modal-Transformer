@@ -247,7 +247,7 @@ def get_dataset(device,args):
     
     
     if args.model_type == "Epoch":   # Dataset to train epoch transformer
-           
+        print("Loading Training Data for one-to-one classification ==================================>")   
         train_dataset = SleepEDF_MultiChan_Dataset(eeg_file = train_eeg_list , 
                                        eog_file = train_eog_list, 
                                        label_file = train_label_list, 
@@ -257,7 +257,7 @@ def get_dataset(device,args):
                                        transform=transforms.Compose([
                                            transforms.ToTensor(),
                                             ]) )
-
+        print("Loading Val Data for one-to-one classification ==================================>")   
         val_dataset = SleepEDF_MultiChan_Dataset(eeg_file = val_eeg_list ,
                                          eog_file = val_eog_list, 
                                          label_file = val_label_list, 
@@ -298,5 +298,76 @@ def get_dataset(device,args):
         plt.title(f"Label {label[0].squeeze()}")
         plt.show()
         fig.savefig(os.path.join(args.project_path,"val_sample.png"))
+    
+    
+    
+    if args.model_type == "Seq":   # Dataset to train sequence cross-modal transformer
+        print("Loading Train Data for many-to-many classification ==================================>") 
+        num_seq = 5
+        train_dataset = SleepEDF_Seq_MultiChan_Dataset(eeg_file = train_eeg_list , 
+                                                   eog_file = train_eog_list, 
+                                                   label_file = train_label_list, 
+                                                   device = device, mean_eeg_l = train_mean_eeg_list, sd_eeg_l = train_sd_eeg_list, 
+                                                   mean_eog_l = train_mean_eog_list, sd_eog_l = train_sd_eog_list, 
+                                                   sub_wise_norm = True,
+                                                   num_seq = args.num_seq,
+                                                   transform=transforms.Compose([
+                                                       transforms.ToTensor(),
+                                                        ]) )
+        print("Loading Val Data for many-to-many classification ==================================>") 
+        val_dataset = SleepEDF_Seq_MultiChan_Dataset(eeg_file = val_eeg_list ,
+                                                 eog_file = val_eog_list, 
+                                                 label_file = val_label_list, 
+                                                 device = device, mean_eeg_l = val_mean_eeg_list, sd_eeg_l = val_sd_eeg_list,
+                                                 mean_eog_l = val_mean_eog_list, sd_eog_l = val_sd_eog_list,
+                                                 sub_wise_norm = True, num_seq = args.num_seq,
+                                                 transform=transforms.Compose([
+                                                       transforms.ToTensor(),
+                                                        ]) )
+        
+        train_data_loader = data.DataLoader(train_dataset, batch_size = args.batch_size, shuffle = True)
+        val_data_loader = data.DataLoader(val_dataset, batch_size = args.batch_size, shuffle = True)
+        
+        eeg_data, eog_data, label = next(iter(train_data_loader))
+        print(f"EEG batch shape: {eeg_data.size()}")
+        print(f"EOG batch shape: {eog_data.size()}")
+        print(f"Labels batch shape: {label.size()}")
+
+        eeg_data_temp = torch.reshape(eeg_data[0],(1,eeg_data[0].shape[1]*eeg_data[0].shape[2]))
+        eog_data_temp = torch.reshape(eog_data[0],(1,eog_data[0].shape[1]*eog_data[0].shape[2]))
+
+        t = np.arange(0,30,1/100)
+        plt.figure(figsize = (10,10))
+        plt.plot(eeg_data_temp[0].squeeze())
+        plt.plot(eog_data_temp[0].squeeze()+5)
+        plt.title(f"Label {label[0].squeeze()}")
+        plt.show()
+
+        eeg_data, eog_data, label = next(iter(val_data_loader))
+        print(f"EEG batch shape: {eeg_data.size()}")
+        print(f"EOG batch shape: {eog_data.size()}")
+        print(f"Labels batch shape: {label.size()}")
+
+        eeg_data_temp = torch.reshape(eeg_data[0],(1,eeg_data[0].shape[1]*eeg_data[0].shape[2]))
+        eog_data_temp = torch.reshape(eog_data[0],(1,eog_data[0].shape[1]*eog_data[0].shape[2]))
+
+        plt.figure(figsize = (10,10))
+        plt.plot(eeg_data_temp[0].squeeze())
+        plt.plot(eog_data_temp[0].squeeze()+5)
+        plt.title(f"Label {label[0].squeeze()}")
+        plt.show()
+
+
+        print(f"EEG Minimum :{eeg_data.min()}")
+        print(f"EEG Maximum :{eeg_data.max()}")
+        print(f"EOG Minimum :{eog_data.min()}")
+        print(f"EOG Maximum :{eog_data.max()}")
+
+
+        print(f"EEG Mean :{torch.mean(eeg_data)}")
+        print(f"EEG Standard Deviation :{torch.std(eeg_data)}")
+        print(f"EOG Mean :{torch.mean(eog_data)}")
+        print(f"EOG Standard Deviation :{torch.std(eog_data)}")
+        
     return train_data_loader, val_data_loader
 

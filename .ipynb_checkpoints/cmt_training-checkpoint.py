@@ -22,7 +22,7 @@ print(f"Torch Version : {torch.__version__}")
 
 from datasets.sleep_edf import split_data, SleepEDF_MultiChan_Dataset, get_dataset
 from models.epoch_cmt import Epoch_Cross_Transformer_Network,train_epoch_cmt
-from models.sequence_cmt import Seq_Cross_Transformer_Network 
+from models.sequence_cmt import Seq_Cross_Transformer_Network, train_seq_cmt 
 from utils.metrics import accuracy, kappa, g_mean, plot_confusion_matrix, confusion_matrix, AverageMeter 
 
 
@@ -39,11 +39,11 @@ def parse_option():
     parser.add_argument('--save_model_freq', type=int, default = 50 ,  help='Frequency of saving the model checkpoint')
 
     #model parameters
-    parser.add_argument('--model_type', type=str, default = 'Epoch'  ,choices=['Epoch', 'Sequence'],  help='Model type')
+    parser.add_argument('--model_type', type=str, default = 'Epoch'  ,choices=['Epoch', 'Seq'],  help='Model type')
     parser.add_argument('--d_model', type=int, default = 256,  help='Embedding size of the CMT')
     parser.add_argument('--dim_feedforward', type=int, default = 1024,  help='No of neurons feed forward block')
     parser.add_argument('--window_size', type=int, default = 50,  help='Size of non-overlapping window')
-    
+    parser.add_argument('--num_seq', type=int, default = 5,  help='Number of epochs in a PSG sequence')
     #training parameters
     parser.add_argument('--batch_size', type=int, default = 32 ,  help='Batch Size')
     
@@ -105,18 +105,27 @@ def main():
             print(f"Initializing Epoch Cross Modal Transformer ==================>")
             Net = Epoch_Cross_Transformer_Network(d_model = args.d_model, dim_feedforward = args.dim_feedforward,
                                                   window_size = args.window_size ).to(device)
+    
+    if args.model_type == "Seq":   # Initialize sequence cross-modal transformer
+        if args.is_retrain:
+            print(f"Loading previous checkpoint from {args.model_path}")
+            Net = torch.load(f"{args.model_path}")
+        else:
+            print(f"Initializing Sequence Cross Modal Transformer ==================>")
+            Net = Seq_Cross_Transformer_Network(d_model = args.d_model, dim_feedforward = args.dim_feedforward,
+                                window_size = args.window_size ).to(device)
 
-        weights = torch.tensor(args.weigths)
-        criterion = nn.CrossEntropyLoss(weight=weights)
-        optimizer = torch.optim.Adam(Net.parameters(), lr=args.lr, betas=(args.beta_1, args.beta_2),
-                                     eps = args.eps, weight_decay = args.weight_decay)
-        lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma) 
+    weights = torch.tensor(args.weigths)
+    criterion = nn.CrossEntropyLoss(weight=weights)
+    optimizer = torch.optim.Adam(Net.parameters(), lr=args.lr, betas=(args.beta_1, args.beta_2),
+                                 eps = args.eps, weight_decay = args.weight_decay)
+    lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma) 
         
     
     if args.is_neptune:
         parameters = {
         "Experiment" : "Training test",
-        'Model Type' : "Epoch Cross-Modal Transformer",
+        'Model Type' : f"{args.model_type} Cross-Modal Transformer",
         'd_model' : args.d_model,
         'dim_feedforward' : args.dim_feedforward,
         'window_size ':args.window_size ,
@@ -143,7 +152,9 @@ def main():
     if args.model_type == "Epoch":  
         train_epoch_cmt(Net, train_data_loader, val_data_loader, criterion, optimizer, lr_scheduler, device, args)
         
-        
+    # Train Seq Cross-Modal Transformer
+    if args.model_type == "Seq":  
+        train_seq_cmt(Net, train_data_loader, val_data_loader, criterion, optimizer, lr_scheduler, device, args)  
         
 if __name__ == '__main__':
     main()
