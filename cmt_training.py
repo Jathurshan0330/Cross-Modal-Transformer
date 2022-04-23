@@ -80,9 +80,7 @@ def main():
     for arg in vars(args):
         print(f"    {arg} :  {getattr(args, arg)}")
     
-    if args.is_neptune:   # Initiate Neptune
-        import neptune.new as neptune
-        run = neptune.init(project= args.nep_project, api_token=args.nep_api)
+
     
     if not os.path.isdir(args.project_path):
         os.makedirs(args.project_path)

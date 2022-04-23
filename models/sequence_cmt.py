@@ -1,5 +1,7 @@
 import copy
 from typing import Optional, Any
+import os
+import numpy as np
 import torch
 import torch.nn as nn
 import time
@@ -18,9 +20,9 @@ from einops.layers.torch import Rearrange, Reduce
 from models.model_blocks import PositionalEncoding, Window_Embedding, Intra_modal_atten, Cross_modal_atten, Feed_forward
 from utils.metrics import accuracy, kappa, g_mean, plot_confusion_matrix, confusion_matrix, AverageMeter
 
-class Epoch_Block(nn.Module):
+class Epoch_Cross_Transformer(nn.Module):
     def __init__(self,d_model = 64, dim_feedforward=512,window_size = 25): #  filt_ch = 4
-        super(Epoch_Block, self).__init__()
+        super(Epoch_Cross_Transformer, self).__init__()
         
         self.eeg_atten = Intra_modal_atten(d_model=d_model, nhead=8, dropout=0.1,
                                             window_size =window_size, First = True )
@@ -41,7 +43,7 @@ class Epoch_Block(nn.Module):
         cross_eeg = cross[:,1,:].unsqueeze(dim=1)
         cross_eog = cross[:,2,:].unsqueeze(dim=1)
 
-        feat_list = [self_eeg,self_eog]  
+        feat_list = [self_eeg,self_eog,cross]  
           
         return cross_cls,feat_list
     
@@ -50,15 +52,15 @@ class Seq_Cross_Transformer_Network(nn.Module):
     def __init__(self,d_model = 64, dim_feedforward=512,window_size = 25): #  filt_ch = 4
         super(Seq_Cross_Transformer_Network, self).__init__()
         
-        self.epoch_1 = Epoch_Block(d_model = d_model, dim_feedforward=dim_feedforward,
+        self.epoch_1 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
                                                 window_size = window_size)
-        self.epoch_2 = Epoch_Block(d_model = d_model, dim_feedforward=dim_feedforward,
+        self.epoch_2 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
                                                 window_size = window_size)
-        self.epoch_3 = Epoch_Block(d_model = d_model, dim_feedforward=dim_feedforward,
+        self.epoch_3 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
                                                 window_size = window_size)
-        self.epoch_4 = Epoch_Block(d_model = d_model, dim_feedforward=dim_feedforward,
+        self.epoch_4 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
                                                 window_size = window_size)
-        self.epoch_5 = Epoch_Block(d_model = d_model, dim_feedforward=dim_feedforward,
+        self.epoch_5 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
                                                 window_size = window_size)
         
         self.seq_atten = Intra_modal_atten(d_model=d_model, nhead=8, dropout=0.1, 
@@ -74,12 +76,12 @@ class Seq_Cross_Transformer_Network(nn.Module):
         self.mlp_5    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))   
         # 
 
-    def forward(self, eeg: Tensor,eog: Tensor,num_seg = 5): 
-        epoch_1 = self.epoch_1(eeg[:,:,0,:],eog[:,:,0,:])[0]
-        epoch_2 = self.epoch_2(eeg[:,:,1,:],eog[:,:,1,:])[0]
-        epoch_3 = self.epoch_3(eeg[:,:,2,:],eog[:,:,2,:])[0]
-        epoch_4 = self.epoch_4(eeg[:,:,3,:],eog[:,:,3,:])[0]
-        epoch_5 = self.epoch_5(eeg[:,:,4,:],eog[:,:,4,:])[0]
+    def forward(self, eeg: Tensor,eog: Tensor,num_seg = 5,is_eval = False): 
+        epoch_1,feat_1 = self.epoch_1(eeg[:,:,0,:],eog[:,:,0,:])
+        epoch_2,feat_2 = self.epoch_2(eeg[:,:,1,:],eog[:,:,1,:])
+        epoch_3,feat_3 = self.epoch_3(eeg[:,:,2,:],eog[:,:,2,:])
+        epoch_4,feat_4 = self.epoch_4(eeg[:,:,3,:],eog[:,:,3,:])
+        epoch_5,feat_5 = self.epoch_5(eeg[:,:,4,:],eog[:,:,4,:])
 
         seq =  torch.cat([epoch_1, epoch_2,epoch_3,epoch_4,epoch_5], dim=1)
         seq = self.seq_atten(seq)
@@ -90,11 +92,22 @@ class Seq_Cross_Transformer_Network(nn.Module):
         out_4 = self.mlp_4(seq[:,3,:])
         out_5 = self.mlp_5(seq[:,4,:])
 
-        return [out_1,out_2,out_3,out_4,out_5]
+        out = [out_1,out_2,out_3,out_4,out_5]
+        Feats = [feat_1,feat_2,feat_3,feat_4,feat_5]
+        if is_eval:
+            return out,seq,Feats
+        else:
+            return out
+            
         
         
         
 def train_seq_cmt(Net, train_data_loader, val_data_loader, criterion,optimizer, lr_scheduler,device, args):
+    
+    if args.is_neptune:   # Initiate Neptune
+        import neptune.new as neptune
+        run = neptune.init(project= args.nep_project, api_token=args.nep_api)
+    
     # Training the model
     best_val_acc = 0
     best_val_kappa = 0
@@ -329,3 +342,58 @@ def train_seq_cmt(Net, train_data_loader, val_data_loader, criterion,optimizer, 
         lr_scheduler.step()
 
     print(f"========================================= Training Completed =================================================")
+    
+    
+    
+def eval_seq_cmt(data_loader, device, args):
+    
+    #Load the test model
+    if args.is_best_kappa: 
+        model_path = os.path.join(args.project_path,"model_check_points/checkpoint_model_best_kappa.pth.tar")
+        print(f"Loading Model : {model_path}")
+        test_model = torch.load(model_path)
+    else:
+        model_path = os.path.join(args.project_path,"model_check_points/checkpoint_model_best_acc.pth.tar")
+        print(f"Loading Model : {model_path}")
+        test_model = torch.load(model_path)
+        
+    test_model.eval()
+        
+    
+    pred_val_main = torch.zeros((len(data_loader)+args.num_seq,1,5))  #data, output,seq pred,
+    labels_val_main = torch.zeros((len(data_loader)+args.num_seq,1))#data, output,seq pred,
+    first = 0 
+    m = nn.Softmax()
+    with torch.no_grad():
+        test_model.eval()
+        for batch_val_idx, data_val in enumerate(data_loader):
+            val_eeg,val_eog, val_labels = data_val
+            pred,_,_ = test_model(val_eeg.float().to(device), val_eog.float().to(device),is_eval = True)
+            labels_val_main[batch_val_idx:batch_val_idx+args.num_seq] += val_labels.squeeze().unsqueeze(dim=1)
+            for ep in range(args.num_seq):
+                pred_val_main[batch_val_idx+ep] += m(pred[ep]).cpu() 
+        
+    pred_val_main = pred_val_main[4:-5]
+    pred_val_main = (pred_val_main/5).squeeze()
+    labels_val_main = labels_val_main[4:-5]
+    labels_val_main = labels_val_main//5
+                
+                
+                
+    sens_l,spec_l,f1_l,prec_l, sens,spec,f1,prec = confusion_matrix(pred_val_main, labels_val_main,
+                                                5, labels_val_main.shape[0])#, print_conf_mat=True)
+
+
+    g = g_mean(sens, spec)
+
+    acc = accuracy(pred_val_main, labels_val_main)
+
+    kap = kappa(pred_val_main, labels_val_main)
+
+    print(f"Accuracy {acc}")
+    print(f"Kappa {kap}")
+    print(f"Macro F1 Score {f1}")
+    print(f"G Mean {g}")
+    print(f"Sensitivity {sens}")
+    print(f"Specificity {spec}")
+    print(f"Class wise F1 Score {f1_l}")

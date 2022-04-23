@@ -1,5 +1,7 @@
 import copy
 from typing import Optional, Any
+import os
+import numpy as np
 import torch
 import time
 import torch.nn as nn
@@ -65,6 +67,10 @@ class Epoch_Cross_Transformer_Network(nn.Module):
         
         
 def train_epoch_cmt(Net, train_data_loader, val_data_loader, criterion,optimizer, lr_scheduler,device, args):
+    
+    if args.is_neptune:   # Initiate Neptune
+        import neptune.new as neptune
+        run = neptune.init(project= args.nep_project, api_token=args.nep_api)
     # Training the model
     best_val_acc = 0
     best_val_kappa = 0
@@ -296,3 +302,58 @@ def train_epoch_cmt(Net, train_data_loader, val_data_loader, criterion,optimizer
         lr_scheduler.step()
 
     print(f"========================================= Training Completed =================================================")
+    
+    
+    
+    
+def eval_epoch_cmt(data_loader, device, args):
+    
+    #Load the test model
+    if args.is_best_kappa:
+        test_model = torch.load(os.path.join(args.project_path,"model_check_points/checkpoint_model_best_kappa.pth.tar"))
+    else:
+        test_model = torch.load(os.path.join(args.project_path,"model_check_points/checkpoint_model_best_acc.pth.tar"))
+        
+    test_model.eval()
+        
+    
+    labels_val_main = []
+    pred_val_main = []
+    first = 0 
+    with torch.no_grad():
+        test_model.eval()
+        for batch_val_idx, data_val in enumerate(data_loader):
+            val_eeg,val_eog, val_labels = data_val
+            cur_val_batch_size = len(val_eeg)
+            pred,_,_ = test_model(val_eeg.float().to(device), val_eog.float().to(device),finetune = True)
+
+
+            if first == 0:
+                labels_val_main = val_labels.cpu().numpy()
+                pred_val_main = pred.cpu().numpy()
+                first = 1
+            else:
+                labels_val_main = np.concatenate((labels_val_main, val_labels.cpu().numpy()))
+                pred_val_main =  np.concatenate((pred_val_main,pred.cpu().numpy()))
+                
+                
+                
+    sens_l,spec_l,f1_l,prec_l, sens,spec,f1,prec = confusion_matrix(torch.from_numpy(pred_val_main),
+                                                                    torch.from_numpy(labels_val_main), 
+                                                                    5, labels_val_main.shape[0], print_conf_mat=True)
+
+
+    g = g_mean(sens, spec)
+
+    acc = accuracy(torch.from_numpy(pred_val_main), torch.from_numpy(labels_val_main))
+
+    kap = kappa(torch.from_numpy(pred_val_main), torch.from_numpy(labels_val_main))
+
+    print("Results ===============================>")
+    print(f"Accuracy {acc}")
+    print(f"Kappa {kap}")
+    print(f"Macro F1 Score {f1}")
+    print(f"G Mean {g}")
+    print(f"Sensitivity {sens}")
+    print(f"Specificity {spec}")
+    print(f"Class wise F1 Score {f1_l}")

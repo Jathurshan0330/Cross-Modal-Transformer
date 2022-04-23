@@ -1,7 +1,7 @@
 import torch
 from torch.autograd import Variable
 from sklearn.metrics import cohen_kappa_score
-
+import matplotlib.pyplot as plt
 
 def accuracy(outputs, labels):
     pred = torch.argmax(outputs, 1)
@@ -66,8 +66,8 @@ def plot_confusion_matrix(cm,
         cmap = plt.get_cmap('Blues')
     if normalize:
         cm2 = cm.astype('float') / cm.sum(axis=0)#[:, np.newaxis]
-    print(cm2)
-    plt.figure(figsize=(8, 6))
+    # print(cm2)
+    fig = plt.figure(figsize=(8, 6))
     plt.imshow(np.transpose(cm2*100), interpolation='nearest', cmap=cmap,vmin =-5 ,vmax =80)
     plt.title(title,fontsize = 20)
     # plt.colorbar()
@@ -96,6 +96,7 @@ def plot_confusion_matrix(cm,
     plt.ylabel('True label',fontsize = 18)
     plt.xlabel('Predictions',fontsize = 18)#\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
     plt.show()
+    fig.savefig("confusion_matrix.png")
 
 
 
@@ -119,7 +120,7 @@ def confusion_matrix(output, label, n_classes, batch_size, print_conf_mat = Fals
           t = int(t.item())
         conf_matrix[p, t] += 1
     if print_conf_mat==True:  
-        print(conf_matrix)
+        # print(conf_matrix)
 
         plot_confusion_matrix(cm = conf_matrix.cpu().numpy(),
                       normalize    = True,
