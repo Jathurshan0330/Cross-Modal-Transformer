@@ -54,4 +54,7 @@ The interpretation plots will be save under "./results/<give project name>/inter
 python cmt_evaluate.py --project_path "./results/<give project name>" --data_path "path/to/dataset" --val_data_list <validation fold as a list==> ex:[4]> --model_type "Seq" --batch_size 1 --is_interpret True
 ```
   
-  [V2_Seg_CMT_Interpret_1788_44001_new.pdf](https://github.com/Jathurshan0330/Cross-Modal-Transformer/files/8548615/V2_Seg_CMT_Interpret_1788_44001_new.pdf)
+![image](https://user-images.githubusercontent.com/52663918/164946114-2f84af8d-a49d-45e7-8836-c492c79e10b1.png)
+  
+![image](https://user-images.githubusercontent.com/52663918/164946126-218a7e1a-6569-4efc-8c3e-b4403497a5f0.png)
+
