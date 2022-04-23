@@ -2,6 +2,7 @@ import copy
 from typing import Optional, Any
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import time
@@ -19,6 +20,7 @@ from einops import rearrange, reduce, repeat
 from einops.layers.torch import Rearrange, Reduce
 from models.model_blocks import PositionalEncoding, Window_Embedding, Intra_modal_atten, Cross_modal_atten, Feed_forward
 from utils.metrics import accuracy, kappa, g_mean, plot_confusion_matrix, confusion_matrix, AverageMeter
+from utils.interpret import plot_interpret, softmax, scaled_dot_product_attention_mod
 
 class Epoch_Cross_Transformer(nn.Module):
     def __init__(self,d_model = 64, dim_feedforward=512,window_size = 25): #  filt_ch = 4
@@ -367,11 +369,121 @@ def eval_seq_cmt(data_loader, device, args):
     with torch.no_grad():
         test_model.eval()
         for batch_val_idx, data_val in enumerate(data_loader):
+            if batch_val_idx%5000 == 0:
+                print("=",end = "")
+                time.sleep(0.2)
             val_eeg,val_eog, val_labels = data_val
-            pred,_,_ = test_model(val_eeg.float().to(device), val_eog.float().to(device),is_eval = True)
+            pred,seq,feat_list = test_model(val_eeg.float().to(device), val_eog.float().to(device),is_eval = True)
             labels_val_main[batch_val_idx:batch_val_idx+args.num_seq] += val_labels.squeeze().unsqueeze(dim=1)
             for ep in range(args.num_seq):
                 pred_val_main[batch_val_idx+ep] += m(pred[ep]).cpu() 
+            
+            if args.is_interpret:
+                if not os.path.isdir(os.path.join(args.project_path,"interpretations")):
+                    os.makedirs(os.path.join(args.project_path,"interpretations"))
+                save_path = os.path.join(args.project_path,f"interpretations/{batch_val_idx}")
+                if not os.path.isdir(os.path.join(args.project_path,f"interpretations/{batch_val_idx}")):
+                    os.makedirs(os.path.join(args.project_path,f"interpretations/{batch_val_idx}"))
+                
+                ####Intra Modal and Cross Modal Relations
+                for ep in range(5):
+                    feat_eeg = feat_list[ep][0]
+                    feat_eog = feat_list[ep][1]
+                    feat_cross = feat_list[ep][2]
+                
+                    _,attn_eeg_output_weights = scaled_dot_product_attention_mod(feat_cross[:,0,:].unsqueeze(dim=1), 
+                                                                               feat_eeg[:,1:,:],feat_eeg[:,1:,:],is_soft_max = False)
+                    _,attn_eog_output_weights = scaled_dot_product_attention_mod(feat_cross[:,0,:].unsqueeze(dim=1), 
+                                                                               feat_eog[:,1:,:],feat_eog[:,1:,:],is_soft_max = False)
+                    _,attn_cross_output_weights = scaled_dot_product_attention_mod(feat_cross[:,0,:].unsqueeze(dim=1), 
+                                                                               feat_cross[:,1:,:],feat_cross[:,1:,:])
+                    
+                    feat_eeg = np.zeros((3000,))
+                    feat_eog = np.zeros((3000,))
+                    for k in range(60):
+                        feat_eeg[k*50:(k+1)*50] = attn_eeg_output_weights[0,0,k].detach().cpu().numpy()
+                        feat_eog[k*50:(k+1)*50] = attn_eog_output_weights[0,0,k].detach().cpu().numpy()
+
+                    t = np.arange(0,30,1/100)
+                    eeg = val_eeg[:,:,ep,:].squeeze().detach().cpu().numpy()
+                    eog = val_eog[:,:,ep,:].squeeze().detach().cpu().numpy()
+
+                    plot_interpret(t,eeg,feat_eeg,signal_type = f"EEG Epoch {ep} pred ={torch.argmax(pred[ep],1)}",label = val_labels[0][ep],save_path=save_path)
+                    plot_interpret(t,eog,feat_eog,signal_type = f"EOG Epoch {ep}  pred ={torch.argmax(pred[ep],1)}",label = val_labels[0][ep],save_path=save_path)
+                    modality_list = ["EEG","EOG"]
+
+                    rgba_colors = np.zeros((2,4))
+                    rgba_colors[:,0]=0.4 #value of red intensity divided by 256 
+                    rgba_colors[:,1]=0  #value of green intensity divided by 256
+                    rgba_colors[:,2]=0  #value of blue intensity divided by 256
+                    rgba_colors[:,-1]=attn_cross_output_weights.squeeze().detach().cpu().numpy()+0.1
+
+                    fig, ax = plt.subplots(figsize = (2, 3))
+                    ax.bar(modality_list, attn_cross_output_weights.squeeze().detach().cpu().numpy(),
+                            color =rgba_colors,align='center', width = 0.8)
+                    # ax.set_xticklabels( attn_cross_output_weights.squeeze().detach().cpu().numpy())
+                    ax.set_ylim(0,1.1)
+                    # ax.tight_layout()
+                    ax.set_title(f"Cross Attention for Epoch {ep}")
+                    rects = ax.patches
+
+                    # Make some labels.
+                    labels = [f"label{i}" for i in range(len(rects))]
+
+                    for rect, label in zip(rects, attn_cross_output_weights.squeeze().detach().cpu().numpy()):
+                        label = ((label*100)//1)/100
+                        height = rect.get_height()
+                        ax.text(
+                            rect.get_x() + rect.get_width() / 2, height + 0.05, label, ha="center", va="bottom",
+                            fontsize = 18,fontweight="bold"
+                        )
+
+                    # plt.show()
+                    fig.savefig(os.path.join(save_path,f"Cross Attention for  Epoch {ep}"))
+                    
+                    
+                ####Inter Epoch relations
+                _,attn_seq_output_weights = scaled_dot_product_attention_mod(seq, seq,seq)#,is_soft_max = False)
+                fig = plt.figure(figsize = (5,5))
+                plt.imshow(attn_seq_output_weights.squeeze().detach().cpu().numpy())
+                plt.colorbar()
+                # plt.show()
+                fig.savefig(os.path.join(save_path,f"Seq Attention for Class {val_labels[0]}"))
+                # print(attn_seq_output_weights.shape)
+                epochs_num = [1,2,3,4,5]
+                for ep in range(5):
+                    _,attn_seq_output_weights = scaled_dot_product_attention_mod(seq[:,ep,:].unsqueeze(dim=0), seq,seq,
+                                                                              is_soft_max = False)
+                    fig, ax = plt.subplots(figsize = (3, 3))
+                    rgba_colors = np.zeros((5,4))
+                    rgba_colors[:,0]=0#value of red intensity divided by 256 
+                    rgba_colors[:,1]=0  #value of green intensity divided by 256
+                    rgba_colors[:,2]=0.4  #value of blue intensity divided by 256
+                    rgba_colors[:,-1]=attn_seq_output_weights.squeeze().detach().cpu().numpy()
+                    ax.bar(epochs_num, attn_seq_output_weights.squeeze().detach().cpu().numpy(),
+                            color =rgba_colors,align='center', width = 0.8)
+                    # ax.set_xticklabels( attn_cross_output_weights.squeeze().detach().cpu().numpy())
+                    ax.set_ylim(0,1.2)
+                    # ax.tight_layout()
+                    ax.set_title(f"Seq Attention for Class  Epoch  {ep}")
+                    rects = ax.patches
+
+                    # Make some labels.
+                    labels = [f"label{i}" for i in range(len(rects))]
+
+                    for rect, label in zip(rects, attn_seq_output_weights.squeeze().detach().cpu().numpy()):
+                        label = ((label*100)//1)/100
+                        height = rect.get_height()
+                        ax.text(
+                            rect.get_x() + rect.get_width() / 2, height , label, ha="center", va="bottom",
+                            fontsize = 13,fontweight="bold"
+                        )
+
+                    # plt.show()
+                    fig.savefig(os.path.join(save_path,f"Seq Attention for Class Epoch  {ep}"))
+                
+        
+        
         
     pred_val_main = pred_val_main[4:-5]
     pred_val_main = (pred_val_main/5).squeeze()
@@ -381,7 +493,7 @@ def eval_seq_cmt(data_loader, device, args):
                 
                 
     sens_l,spec_l,f1_l,prec_l, sens,spec,f1,prec = confusion_matrix(pred_val_main, labels_val_main,
-                                                5, labels_val_main.shape[0])#, print_conf_mat=True)
+                                                5, labels_val_main.shape[0], print_conf_mat=True)
 
 
     g = g_mean(sens, spec)

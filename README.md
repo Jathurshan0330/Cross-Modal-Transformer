@@ -45,3 +45,9 @@ Evaluate Sequence Cross-Modal Transformer
 python cmt_evaluate.py --project_path "./results/<give project name>" --data_path "path/to/dataset" --val_data_list <validation fold as a list==> ex:[4]> --model_type "Seq" --batch_size 1
 ```
 
+### Get Interpretations
+
+The interpretation plots will be save under "./results/<give project name>/interpretations/<Data no>"
+```
+python cmt_evaluate.py --project_path "./results/<give project name>" --data_path "path/to/dataset" --val_data_list <validation fold as a list==> ex:[4]> --model_type "Seq" --batch_size 1 --is_interpret True
+```

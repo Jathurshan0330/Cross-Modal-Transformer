@@ -76,4 +76,7 @@ if __name__ == '__main__':
     
 #python cmt_evaluate.py --project_path "testing" --data_path "/home/mmsm/Sleep_EDF_Dataset" --val_data_list [4] --model_type "Epoch" --batch_size 1
 
-#python cmt_evaluate.py --project_path "testing_seq" --data_path "/home/mmsm/Sleep_EDF_Dataset" --val_data_list [4] --model_type "Seq" --batch_size 1
+#python cmt_evaluate.py --project_path "testing_seq" --data_path "/home/mmsm/Sleep_EDF_Dataset" --val_data_list [4] --model_type "Seq" --batch_size 1 
+
+
+#python cmt_evaluate.py --project_path "testing_seq" --data_path "/home/mmsm/Sleep_EDF_Dataset" --val_data_list [4] --model_type "Seq" --batch_size 1 --is_interpret True
