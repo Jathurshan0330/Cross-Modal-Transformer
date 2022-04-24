@@ -2,7 +2,7 @@
 
 Accurate sleep stage classification plays a crucial role in sleep health and medicine. In recent years, several deep learning-based sleep staging algorithms were developed and have achieved performance on par with human annotation. Limitation of deep-learning based algorithms is their blackbox behavior, which restricts their application in clinical environment. We propose cross-modal transformers for sleep stage classification to achieve both competitive performance with state-of-the-art approaches and interpretability. This repository contains the implementation of epoch and sequence cross-modal transformers and the interpretations. 
 
-![combined both models](https://user-images.githubusercontent.com/52663918/164946073-30f00556-b073-4aa0-8d52-460766a20a23.png){ width: 200px; }
+![combined both models](https://user-images.githubusercontent.com/52663918/164946073-30f00556-b073-4aa0-8d52-460766a20a23.png){ width: 100px; }
 
 ## Getting Started
 
