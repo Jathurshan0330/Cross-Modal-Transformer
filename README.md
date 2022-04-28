@@ -6,7 +6,7 @@ Accurate sleep stage classification plays a crucial role in sleep health and med
 
 ## Getting Started
 
-### Installation
+### Installation Guide
 Run our algorithm using Pytorch and CUDA https://pytorch.org/
 
 ```
