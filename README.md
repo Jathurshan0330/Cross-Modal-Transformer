@@ -2,7 +2,9 @@
 
 Accurate sleep stage classification is significant for sleep health assessment. In recent years, several deep learning and machine learning based sleep staging algorithms have been developed and they have achieved performance on par with human annotation. Despite improved performance, a limitation of most deep-learning based algorithms is their Black-box behavior, which which have limited their use in clinical settings. Here, we propose Cross-Modal Transformers, which is a transformer-based method for sleep stage classification. Our models achieve both competitive performance with the state-of-the-art approaches and eliminates the Black-box behavior of deep-learning models by  utilizing the interpretability aspect of the attention modules. The proposed cross-modal transformers consist of a novel cross-modal transformer encoder architecture along with a multi-scale 1-dimensional convolutional neural network for automatic representation learning. Our sleep stage classifier based on this design was able to achieve sleep stage classification performance on par with or better than the state-of-the-art approaches, along with interpretability, a fourfold reduction in the number of parameters and a reduced training time compared to the current state-of-the-art. This repository contains the implementation of epoch and sequence cross-modal transformers and the interpretations. 
 
-![combined both models](https://user-images.githubusercontent.com/52663918/164946073-30f00556-b073-4aa0-8d52-460766a20a23.png)
+![Epoch_CMT-1](https://user-images.githubusercontent.com/67052077/184390866-261038c3-4624-4857-872f-6d46c9c5363c.png)
+![Seq_CMT-1](https://user-images.githubusercontent.com/67052077/184390916-1f5f811f-8416-4a62-8a52-a0e800144c7e.png)
+
 
 ## Getting Started
 
@@ -53,8 +55,16 @@ The interpretation plots will be save under "./results/<give project name>/inter
 ```
 python cmt_evaluate.py --project_path "./results/<give project name>" --data_path "path/to/dataset" --val_data_list <validation fold as a list==> ex:[4]> --model_type "Seq" --batch_size 1 --is_interpret True
 ```
+ 
   
-![image](https://user-images.githubusercontent.com/52663918/164946114-2f84af8d-a49d-45e7-8836-c492c79e10b1.png)
+ ## Sleep Stage Classification Results
   
-![image](https://user-images.githubusercontent.com/52663918/164946126-218a7e1a-6569-4efc-8c3e-b4403497a5f0.png)
+![Presentation2-1](https://user-images.githubusercontent.com/67052077/184391117-132d3052-e0ee-4bb8-a48c-b6a32eef7138.png)
+
+## Interpretation Results
+  
+  ![33320_interpret-1](https://user-images.githubusercontent.com/67052077/184392262-1f85ea13-70a5-4d84-bb9e-491957e21929.png)
+
+![44001_interpret-1](https://user-images.githubusercontent.com/67052077/184392276-c29553cb-9268-43d4-88ea-bfd8c1b20e0f.png)
+
 
