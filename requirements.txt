@@ -6,3 +6,4 @@ neptune-client
 scikit-image
 sklearn
 einops
+mne
