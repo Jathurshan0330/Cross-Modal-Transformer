@@ -1,5 +1,20 @@
 # Towards Interpretable Sleep Stage Classification Using Cross-Modal Transformers
 
+## Citation
+If you find our work or this repository useful, please consider giving a star :star: and citation.
+```bibtex
+@article{pradeepkumar2022towards,
+  title={Towards Interpretable Sleep Stage Classification Using Cross-Modal Transformers},
+  author={Pradeepkumar, Jathurshan and Anandakumar, Mithunjha and Kugathasan, Vinith and Suntharalingham, Dhinesh and Kappel, Simon L and De Silva, Anjula C and Edussooriya, Chamira US},
+  journal={arXiv preprint arXiv:2208.06991},
+  year={2022}
+}
+
+```
+
+
+## Abstract 
+
 Accurate sleep stage classification is significant for sleep health assessment. In recent years, several deep learning and machine learning based sleep staging algorithms have been developed and they have achieved performance on par with human annotation. Despite improved performance, a limitation of most deep-learning based algorithms is their Black-box behavior, which which have limited their use in clinical settings. Here, we propose Cross-Modal Transformers, which is a transformer-based method for sleep stage classification. Our models achieve both competitive performance with the state-of-the-art approaches and eliminates the Black-box behavior of deep-learning models by  utilizing the interpretability aspect of the attention modules. The proposed cross-modal transformers consist of a novel cross-modal transformer encoder architecture along with a multi-scale 1-dimensional convolutional neural network for automatic representation learning. Our sleep stage classifier based on this design was able to achieve sleep stage classification performance on par with or better than the state-of-the-art approaches, along with interpretability, a fourfold reduction in the number of parameters and a reduced training time compared to the current state-of-the-art. This repository contains the implementation of epoch and sequence cross-modal transformers and the interpretations. 
 
 ![Epoch_CMT-1](https://user-images.githubusercontent.com/67052077/184390866-261038c3-4624-4857-872f-6d46c9c5363c.png)
