@@ -114,10 +114,89 @@ class SleepEDF_MultiChan_Dataset(Dataset):
     
 # For Many-to-many Classification
 
-class SleepEDF_Seq_MultiChan_Dataset(Dataset):
+# class SleepEDF_Seq_MultiChan_Dataset(Dataset):
+#     def __init__(self, eeg_file, eog_file, label_file, device, mean_eeg_l = None, sd_eeg_l = None, 
+#                  mean_eog_l = None, sd_eog_l = None,transform=None, target_transform=None, 
+#                  sub_wise_norm = False, data_type = None, num_seq = 5):
+#         """
+      
+#         """
+#         # Get the data
+#         for i in range(len(eeg_file)):
+#           if i == 0:
+#             self.eeg = read_h5py(eeg_file[i])
+#             self.eog = read_h5py(eog_file[i])
+        
+
+#             self.labels = read_h5py(label_file[i])
+#           else:
+#             self.eeg = np.concatenate((self.eeg, read_h5py(eeg_file[i])),axis = 0)
+#             self.eog = np.concatenate((self.eog, read_h5py(eog_file[i])),axis = 0)
+#             self.labels = np.concatenate((self.labels, read_h5py(label_file[i])),axis = 0)
+
+#         self.labels = torch.from_numpy(self.labels)
+        
+
+#         bin_labels = np.bincount(self.labels)
+#         print(f"Labels count: {bin_labels}")
+#         print(f"Shape of EEG : {self.eeg.shape} , EOG : {self.eog.shape}")
+#         print(f"Shape of Labels : {self.labels.shape}")
+
+#         if sub_wise_norm == True:
+#           print(f"Reading Subject wise mean and sd")
+#           for i in range(len(mean_eeg_l)):
+#             if i == 0:
+#               self.mean_eeg  = read_h5py(mean_eeg_l[i])
+#               self.sd_eeg = read_h5py(sd_eeg_l[i])
+#               self.mean_eog  = read_h5py(mean_eog_l[i])
+#               self.sd_eog = read_h5py(sd_eog_l[i])
+#             else:
+#               self.mean_eeg = np.concatenate((self.mean_eeg, read_h5py(mean_eeg_l[i])),axis = 0)
+#               self.sd_eeg = np.concatenate((self.sd_eeg, read_h5py(sd_eeg_l[i])),axis = 0)
+#               self.mean_eog = np.concatenate((self.mean_eog, read_h5py(mean_eog_l[i])),axis = 0)
+#               self.sd_eog = np.concatenate((self.sd_eog, read_h5py(sd_eog_l[i])),axis = 0)
+          
+#           print(f"Shapes of Mean  : EEG: {self.mean_eeg.shape}, EOG : {self.mean_eog.shape}")
+#           print(f"Shapes of Sd  : EEG: {self.sd_eeg.shape}, EOG : {self.sd_eog.shape}")
+#         else:     
+#           self.mean = mean_l
+#           self.sd = sd_l
+#           print(f"Mean : {self.mean} and SD {self.sd}")  
+
+#         self.sub_wise_norm = sub_wise_norm
+#         self.device = device
+#         self.transform = transform
+#         self.target_transform = target_transform
+#         self.num_seq = num_seq
+
+#     def __len__(self):
+#         return len(self.labels) - self.num_seq
+
+#     def __getitem__(self, idx):
+#         eeg_data = self.eeg[idx:idx+self.num_seq].squeeze()   
+#         eog_data = self.eog[idx:idx+self.num_seq].squeeze() 
+#         label = self.labels[idx:idx+self.num_seq,]   #######
+      
+#         if self.sub_wise_norm ==True:
+#           eeg_data = (eeg_data - self.mean_eeg[idx]) / self.sd_eeg[idx]
+#           eog_data = (eog_data - self.mean_eog[idx]) / self.sd_eog[idx]
+#         elif self.mean and self.sd:
+#           eeg_data = (eeg_data-self.mean[0])/self.sd[0]
+#           eog_data = (eog_data-self.mean[1])/self.sd[1]
+#         if self.transform:
+#             eeg_data = self.transform(eeg_data)
+#             eog_data = self.transform(eog_data)
+#         if self.target_transform:
+#             label = self.target_transform(label)
+#         return eeg_data, eog_data, label
+    
+ 
+
+# For Many-to-many Classification Main Dataset Class
+class SleepEDF_Seq_MultiChan_Dataset_Main(Dataset):
     def __init__(self, eeg_file, eog_file, label_file, device, mean_eeg_l = None, sd_eeg_l = None, 
-                 mean_eog_l = None, sd_eog_l = None,transform=None, target_transform=None, 
-                 sub_wise_norm = False, data_type = None, num_seq = 5):
+                 mean_eog_l = None, sd_eog_l = None, mean_eeg2_l = None, sd_eeg2_l = None,transform=None, 
+                 target_transform=None, sub_wise_norm = False, num_seq = 5):
         """
       
         """
@@ -126,7 +205,6 @@ class SleepEDF_Seq_MultiChan_Dataset(Dataset):
           if i == 0:
             self.eeg = read_h5py(eeg_file[i])
             self.eog = read_h5py(eog_file[i])
-        
 
             self.labels = read_h5py(label_file[i])
           else:
@@ -139,7 +217,8 @@ class SleepEDF_Seq_MultiChan_Dataset(Dataset):
 
         bin_labels = np.bincount(self.labels)
         print(f"Labels count: {bin_labels}")
-        print(f"Shape of EEG : {self.eeg.shape} , EOG : {self.eog.shape}")
+        print(f"Labels count weights: {1/bin_labels}")
+        print(f"Shape of EEG : {self.eeg.shape} , EOG : {self.eog.shape}")#, EMG: {self.eeg2.shape}")
         print(f"Shape of Labels : {self.labels.shape}")
 
         if sub_wise_norm == True:
@@ -150,14 +229,21 @@ class SleepEDF_Seq_MultiChan_Dataset(Dataset):
               self.sd_eeg = read_h5py(sd_eeg_l[i])
               self.mean_eog  = read_h5py(mean_eog_l[i])
               self.sd_eog = read_h5py(sd_eog_l[i])
+              
             else:
               self.mean_eeg = np.concatenate((self.mean_eeg, read_h5py(mean_eeg_l[i])),axis = 0)
               self.sd_eeg = np.concatenate((self.sd_eeg, read_h5py(sd_eeg_l[i])),axis = 0)
               self.mean_eog = np.concatenate((self.mean_eog, read_h5py(mean_eog_l[i])),axis = 0)
               self.sd_eog = np.concatenate((self.sd_eog, read_h5py(sd_eog_l[i])),axis = 0)
+              
+          if data_type == 'train':   # Removing wake epochs
+            self.mean_eeg = np.delete(self.mean_eeg,obj = wake,axis = 0)
+            self.sd_eeg = np.delete(self.sd_eeg,obj = wake,axis = 0)
+            self.mean_eog = np.delete(self.mean_eog,obj = wake,axis = 0)
+            self.sd_eog = np.delete(self.sd_eog,obj = wake,axis = 0)
           
-          print(f"Shapes of Mean  : EEG: {self.mean_eeg.shape}, EOG : {self.mean_eog.shape}")
-          print(f"Shapes of Sd  : EEG: {self.sd_eeg.shape}, EOG : {self.sd_eog.shape}")
+          print(f"Shapes of Mean  : EEG: {self.mean_eeg.shape}, EOG : {self.mean_eog.shape}")#, EMG : {self.mean_eeg2.shape}")
+          print(f"Shapes of Sd  : EEG: {self.sd_eeg.shape}, EOG : {self.sd_eog.shape}")#, EMG : {self.sd_eeg2.shape}")
         else:     
           self.mean = mean_l
           self.sd = sd_l
@@ -175,8 +261,9 @@ class SleepEDF_Seq_MultiChan_Dataset(Dataset):
     def __getitem__(self, idx):
         eeg_data = self.eeg[idx:idx+self.num_seq].squeeze()   
         eog_data = self.eog[idx:idx+self.num_seq].squeeze() 
+        
         label = self.labels[idx:idx+self.num_seq,]   #######
-      
+        
         if self.sub_wise_norm ==True:
           eeg_data = (eeg_data - self.mean_eeg[idx]) / self.sd_eeg[idx]
           eog_data = (eog_data - self.mean_eog[idx]) / self.sd_eog[idx]
@@ -189,7 +276,6 @@ class SleepEDF_Seq_MultiChan_Dataset(Dataset):
         if self.target_transform:
             label = self.target_transform(label)
         return eeg_data, eog_data, label
-    
     
     
 
