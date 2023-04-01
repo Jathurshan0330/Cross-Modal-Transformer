@@ -171,17 +171,185 @@ print(subjects)
 # Change Channels to extract data for other PSG channels 'eeg1', ''eog', 'eeg2'
 # ==============================================================>
 
+# ==============================================================>
+# For 'eeg1'
+# ==============================================================>
+
+## Save Path
+save_path = f"./extract_dataset_single_epoch"
+if not os.path.exists(save_path):
+  os.mkdir(save_path)
+
 eeg1_1, labels_1, len_1, eeg1_m1, eeg1_std1 = signal_extract(sub_1, days, channel = 'eeg1', filter = True, freq = [0.2,40])
 print(f"Train data shape : {eeg1_1.shape}, Train label shape : {labels_1.shape}")
+
+#### Save data as .h5. ######
+hf = h5py.File(f'{save_path}/x1.h5', 'w')
+hf.create_dataset('data', data= eeg1_1)
+hf.close()
+hf = h5py.File(f'{save_path}/y1.h5', 'w')
+hf.create_dataset('data', data= labels_1)
+hf.close()
+hf = h5py.File(f'{save_path}/mean1.h5', 'w')
+hf.create_dataset('data', data= eeg1_m1)
+hf.close()
+hf = h5py.File(f'{save_path}/std1.h5', 'w')
+hf.create_dataset('data', data= eeg1_std1)
+hf.close()
 
 eeg1_2, labels_2, len_2, eeg1_m2, eeg1_std2 =  signal_extract(sub_2, days, channel = 'eeg1', filter = True, freq = [0.2,40])
 print(f"Train data shape : {eeg1_2.shape}, Train label shape : {labels_2.shape}")
 
+#### Save data as .h5. ######
+hf = h5py.File(f'{save_path}/x2.h5', 'w')
+hf.create_dataset('data', data= eeg1_2)
+hf.close()
+hf = h5py.File(f'{save_path}/y2.h5', 'w')
+hf.create_dataset('data', data= labels_2)
+hf.close()
+hf = h5py.File(f'{save_path}/mean2.h5', 'w')
+hf.create_dataset('data', data= eeg1_m2)
+hf.close()
+hf = h5py.File(f'{save_path}/std2.h5', 'w')
+hf.create_dataset('data', data= eeg1_std2)
+hf.close()
+
 eeg1_3, labels_3, len_3, eeg1_m3, eeg1_std3 =  signal_extract(sub_3, days, channel = 'eeg1', filter = True, freq = [0.2,40])
 print(f"Train data shape : {eeg1_3.shape}, Train label shape : {labels_3.shape}")
+
+#### Save data as .h5. ######
+hf = h5py.File(f'{save_path}/x3.h5', 'w')
+hf.create_dataset('data', data= eeg1_3)
+hf.close()
+hf = h5py.File(f'{save_path}/y3.h5', 'w')
+hf.create_dataset('data', data= labels_3)
+hf.close()
+hf = h5py.File(f'{save_path}/mean3.h5', 'w')
+hf.create_dataset('data', data= eeg1_m3)
+hf.close()
+hf = h5py.File(f'{save_path}/std3.h5', 'w')
+hf.create_dataset('data', data= eeg1_std3)
+hf.close()
+
 
 eeg1_4, labels_4, len_4, eeg1_m4, eeg1_std4 =  signal_extract(sub_4, days, channel = 'eeg1', filter = True, freq = [0.2,40])
 print(f"Train data shape : {eeg1_4.shape}, Train label shape : {labels_4.shape}")
 
+#### Save data as .h5. ######
+hf = h5py.File(f'{save_path}/x4.h5', 'w')
+hf.create_dataset('data', data= eeg1_4)
+hf.close()
+hf = h5py.File(f'{save_path}/y4.h5', 'w')
+hf.create_dataset('data', data= labels_4)
+hf.close()
+hf = h5py.File(f'{save_path}/mean4.h5', 'w')
+hf.create_dataset('data', data= eeg1_m4)
+hf.close()
+hf = h5py.File(f'{save_path}/std4.h5', 'w')
+hf.create_dataset('data', data= eeg1_std4)
+hf.close()
+
+
 eeg1_5, labels_5, len_5, eeg1_m5, eeg1_std5 =  signal_extract(sub_5, days, channel = 'eeg1', filter = True, freq = [0.2,40])
 print(f"Train data shape : {eeg1_5.shape}, Train label shape : {labels_5.shape}")
+
+#### Save data as .h5. ######
+hf = h5py.File(f'{save_path}/x5.h5', 'w')
+hf.create_dataset('data', data= eeg1_5)
+hf.close()
+hf = h5py.File(f'{save_path}/y5.h5', 'w')
+hf.create_dataset('data', data= labels_5)
+hf.close()
+hf = h5py.File(f'{save_path}/mean5.h5', 'w')
+hf.create_dataset('data', data= eeg1_m5)
+hf.close()
+hf = h5py.File(f'{save_path}/std5.h5', 'w')
+hf.create_dataset('data', data= eeg1_std5)
+hf.close()
+
+
+# ==============================================================>
+# For 'eog'
+# ==============================================================>
+
+
+eog1, labels_1, len_1, eog_m1, eog_std1= signal_extract(sub_1, days, channel = 'eeg1', filter = True, freq = [0.2,40])
+print(f"Train data shape : {eog1.shape}, Train label shape : {labels_1.shape}")
+
+#### Save data as .h5. ######
+#### Save data as .h5. ######
+hf = h5py.File(f'{save_path}/eog1.h5', 'w')
+hf.create_dataset('data', data= eog1)
+hf.close()
+hf = h5py.File(f'{save_path}/eog_m1.h5', 'w')
+hf.create_dataset('data', data= eog_m1)
+hf.close()
+hf = h5py.File(f'{save_path}/eog_std1.h5', 'w')
+hf.create_dataset('data', data= eog_std1)
+hf.close()
+
+
+eog2, labels_2, len_2, eog_m2, eog_std2 =  signal_extract(sub_2, days, channel = 'eeg1', filter = True, freq = [0.2,40])
+print(f"Train data shape : {eog2.shape}, Train label shape : {labels_2.shape}")
+
+#### Save data as .h5. ######
+#### Save data as .h5. ######
+hf = h5py.File(f'{save_path}/eog2.h5', 'w')
+hf.create_dataset('data', data= eog2)
+hf.close()
+hf = h5py.File(f'{save_path}/eog_m2.h5', 'w')
+hf.create_dataset('data', data= eog_m2)
+hf.close()
+hf = h5py.File(f'{save_path}/eog_std2.h5', 'w')
+hf.create_dataset('data', data= eog_std2)
+hf.close()
+
+
+eog3, labels_3, len_3, eog_m3, eog_std3 =  signal_extract(sub_3, days, channel = 'eeg1', filter = True, freq = [0.2,40])
+print(f"Train data shape : {eog3.shape}, Train label shape : {labels_3.shape}")
+
+#### Save data as .h5. ######
+hf = h5py.File(f'{save_path}/eog3.h5', 'w')
+hf.create_dataset('data', data= eog3)
+hf.close()
+hf = h5py.File(f'{save_path}/eog_m3.h5', 'w')
+hf.create_dataset('data', data= eog_m3)
+hf.close()
+hf = h5py.File(f'{save_path}/eog_std3.h5', 'w')
+hf.create_dataset('data', data= eog_std3)
+hf.close()
+
+
+
+eog4, labels_4, len_4, eog_m4, eog_std4  =  signal_extract(sub_4, days, channel = 'eeg1', filter = True, freq = [0.2,40])
+print(f"Train data shape : {eog4.shape}, Train label shape : {labels_4.shape}")
+
+#### Save data as .h5. ######
+hf = h5py.File(f'{save_path}/eog4.h5', 'w')
+hf.create_dataset('data', data= eog4)
+hf.close()
+hf = h5py.File(f'{save_path}/eog_m4.h5', 'w')
+hf.create_dataset('data', data= eog_m4)
+hf.close()
+hf = h5py.File(f'{save_path}/eog_std4.h5', 'w')
+hf.create_dataset('data', data= eog_std4)
+hf.close()
+
+
+
+eog5, labels_5, len_5, eog_m5, eog_std5  =  signal_extract(sub_5, days, channel = 'eeg1', filter = True, freq = [0.2,40])
+print(f"Train data shape : {eeg1_5.shape}, Train label shape : {labels_5.shape}")
+
+#### Save data as .h5. ######
+hf = h5py.File(f'{save_path}/eog5.h5', 'w')
+hf.create_dataset('data', data= eog5)
+hf.close()
+hf = h5py.File(f'{save_path}/eog_m5.h5', 'w')
+hf.create_dataset('data', data= eog_m5)
+hf.close()
+hf = h5py.File(f'{save_path}/eog_std5.h5', 'w')
+hf.create_dataset('data', data= eog_std5)
+hf.close()
+
+
+
