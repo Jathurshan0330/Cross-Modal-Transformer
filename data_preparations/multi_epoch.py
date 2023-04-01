@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import random
 import mne
 from mne.datasets.sleep_physionet.age import fetch_data
-from mne.time_frequency import tfr_morlet, psd_multitaper, psd_welch
+# from mne.time_frequency import tfr_morlet, psd_multitaper, psd_welch
 import h5py
 
 
