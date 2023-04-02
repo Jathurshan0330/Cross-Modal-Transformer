@@ -193,23 +193,23 @@ class Seq15_Cross_Transformer_Network(nn.Module):
         #     eog_epoch = torch.cat((eog_epoch,eog[:,:,ep,:]),dim=-1)
 
         # print(eeg_epoch.shape,eog_epoch.shape)
-        epoch_1 = self.epoch_1(eeg[:,:,0,:],eog[:,:,0,:])[0]
-        epoch_2 = self.epoch_2(eeg[:,:,1,:],eog[:,:,1,:])[0]
-        epoch_3 = self.epoch_3(eeg[:,:,2,:],eog[:,:,2,:])[0]
-        epoch_4 = self.epoch_4(eeg[:,:,3,:],eog[:,:,3,:])[0]
-        epoch_5 = self.epoch_5(eeg[:,:,4,:],eog[:,:,4,:])[0]
+        epoch_1,feat_1 = self.epoch_1(eeg[:,:,0,:],eog[:,:,0,:])#[0]
+        epoch_2,feat_2 = self.epoch_2(eeg[:,:,1,:],eog[:,:,1,:])#[0]
+        epoch_3,feat_3 = self.epoch_3(eeg[:,:,2,:],eog[:,:,2,:])#[0]
+        epoch_4,feat_4 = self.epoch_4(eeg[:,:,3,:],eog[:,:,3,:])#[0]
+        epoch_5,feat_5 = self.epoch_5(eeg[:,:,4,:],eog[:,:,4,:])#[0]
         # print(epoch_1.shape,epoch_5.shape)
-        epoch_6 = self.epoch_6(eeg[:,:,5,:],eog[:,:,5,:])[0]
-        epoch_7 = self.epoch_7(eeg[:,:,6,:],eog[:,:,6,:])[0]
-        epoch_8 = self.epoch_8(eeg[:,:,7,:],eog[:,:,7,:])[0]
-        epoch_9 = self.epoch_9(eeg[:,:,8,:],eog[:,:,8,:])[0]
-        epoch_10 = self.epoch_10(eeg[:,:,9,:],eog[:,:,9,:])[0]
+        epoch_6,feat_6 = self.epoch_6(eeg[:,:,5,:],eog[:,:,5,:])#[0]
+        epoch_7,feat_7 = self.epoch_7(eeg[:,:,6,:],eog[:,:,6,:])#[0]
+        epoch_8,feat_8 = self.epoch_8(eeg[:,:,7,:],eog[:,:,7,:])#[0]
+        epoch_9,feat_9 = self.epoch_9(eeg[:,:,8,:],eog[:,:,8,:])#[0]
+        epoch_10,feat_10 = self.epoch_10(eeg[:,:,9,:],eog[:,:,9,:])#[0]
         # print(epoch_1.shape,epoch_5.shape)
-        epoch_11 = self.epoch_11(eeg[:,:,10,:],eog[:,:,10,:])[0]
-        epoch_12 = self.epoch_12(eeg[:,:,11,:],eog[:,:,11,:])[0]
-        epoch_13 = self.epoch_13(eeg[:,:,12,:],eog[:,:,12,:])[0]
-        epoch_14 = self.epoch_14(eeg[:,:,13,:],eog[:,:,13,:])[0]
-        epoch_15 = self.epoch_15(eeg[:,:,14,:],eog[:,:,14,:])[0]
+        epoch_11,feat_11 = self.epoch_11(eeg[:,:,10,:],eog[:,:,10,:])#[0]
+        epoch_12,feat_12 = self.epoch_12(eeg[:,:,11,:],eog[:,:,11,:])#[0]
+        epoch_13,feat_13 = self.epoch_13(eeg[:,:,12,:],eog[:,:,12,:])#[0]
+        epoch_14,feat_14 = self.epoch_14(eeg[:,:,13,:],eog[:,:,13,:])#[0]
+        epoch_15,feat_15 = self.epoch_15(eeg[:,:,14,:],eog[:,:,14,:])#[0]
         # print(epoch_1.shape,epoch_5.shape)
         # epoch_16 = self.epoch_16(eeg[:,:,15,:],eog[:,:,15,:])[0]
         # epoch_17 = self.epoch_17(eeg[:,:,16,:],eog[:,:,16,:])[0]
