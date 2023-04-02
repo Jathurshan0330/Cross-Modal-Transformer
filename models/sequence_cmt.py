@@ -253,9 +253,9 @@ class Seq15_Cross_Transformer_Network(nn.Module):
 #         out_20 = self.mlp_20(seq[:,19,:])
         
 #         out_21 = self.mlp_21(seq[:,20,:])
-
+        feat_list  = [feat_1,feat_2,feat_3,feat_4,feat_5,feat_6,feat_7,feat_8,feat_9,feat_10,feat_11,feat_12,feat_13,feat_14,feat_15,seq]
         # print(out_1.shape)
-        return [out_1,out_2,out_3,out_4,out_5,out_6,out_7,out_8,out_9,out_10,out_11,out_12,out_13,out_14,out_15]#,out_16,out_17,out_18,out_19,out_20,out_21]
+        return [out_1,out_2,out_3,out_4,out_5,out_6,out_7,out_8,out_9,out_10,out_11,out_12,out_13,out_14,out_15],feat_list#,out_16,out_17,out_18,out_19,out_20,out_21]
         
         
 def train_seq_cmt(Net, train_data_loader, val_data_loader, criterion,optimizer, lr_scheduler,device, args):
