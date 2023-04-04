@@ -397,18 +397,38 @@ def get_dataset(device,args,only_val = False):
     if args.model_type == "Seq":   # Dataset to train sequence cross-modal transformer
         if only_val == False:
             print("Loading Train Data for many-to-many classification ==================================>") 
-            train_dataset = SleepEDF_Seq_MultiChan_Dataset(eeg_file = train_eeg_list , 
-                                                       eog_file = train_eog_list, 
-                                                       label_file = train_label_list, 
-                                                       device = device, mean_eeg_l = train_mean_eeg_list, sd_eeg_l = train_sd_eeg_list, 
-                                                       mean_eog_l = train_mean_eog_list, sd_eog_l = train_sd_eog_list, 
-                                                       sub_wise_norm = True,
-                                                       num_seq = args.num_seq,
-                                                       transform=transforms.Compose([
-                                                           transforms.ToTensor(),
-                                                            ]) )
+#             train_dataset = SleepEDF_Seq_MultiChan_Dataset(eeg_file = train_eeg_list , 
+#                                                        eog_file = train_eog_list, 
+#                                                        label_file = train_label_list, 
+#                                                        device = device, mean_eeg_l = train_mean_eeg_list, sd_eeg_l = train_sd_eeg_list, 
+#                                                        mean_eog_l = train_mean_eog_list, sd_eog_l = train_sd_eog_list, 
+#                                                        sub_wise_norm = True,
+#                                                        num_seq = args.num_seq,
+#                                                        transform=transforms.Compose([
+#                                                            transforms.ToTensor(),
+#                                                             ]) )
+
+            train_dataset = SleepEDF_Seq_MultiChan_Dataset_Main(eeg_file = train_eeg_list , 
+                                                           eog_file = train_eog_list, 
+                                                           label_file = train_label_list, 
+                                                           device = device, mean_eeg_l = train_mean_eeg_list, sd_eeg_l = train_sd_eeg_list, 
+                                                           mean_eog_l = train_mean_eog_list, sd_eog_l = train_sd_eog_list, 
+                                                           sub_wise_norm = True,
+                                                           num_seq = args.num_seq,
+                                                           transform=transforms.Compose([
+                                                               transforms.ToTensor(),
+                                                                ]) )
         print("Loading Val Data for many-to-many classification ==================================>") 
-        val_dataset = SleepEDF_Seq_MultiChan_Dataset(eeg_file = val_eeg_list ,
+#         val_dataset = SleepEDF_Seq_MultiChan_Dataset(eeg_file = val_eeg_list ,
+#                                                  eog_file = val_eog_list, 
+#                                                  label_file = val_label_list, 
+#                                                  device = device, mean_eeg_l = val_mean_eeg_list, sd_eeg_l = val_sd_eeg_list,
+#                                                  mean_eog_l = val_mean_eog_list, sd_eog_l = val_sd_eog_list,
+#                                                  sub_wise_norm = True, num_seq = args.num_seq,
+#                                                  transform=transforms.Compose([
+#                                                        transforms.ToTensor(),
+#                                                         ]) )
+        val_dataset = SleepEDF_Seq_MultiChan_Dataset_Main(eeg_file = val_eeg_list ,
                                                  eog_file = val_eog_list, 
                                                  label_file = val_label_list, 
                                                  device = device, mean_eeg_l = val_mean_eeg_list, sd_eeg_l = val_sd_eeg_list,
