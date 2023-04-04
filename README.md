@@ -83,7 +83,9 @@ python cmt_evaluate.py --project_path "./results/<give project name>" --data_pat
   
  ## Sleep Stage Classification Results
   
-![Presentation2-1](https://user-images.githubusercontent.com/67052077/184391117-132d3052-e0ee-4bb8-a48c-b6a32eef7138.png)
+
+![param_model_acc-1](https://user-images.githubusercontent.com/52663918/229873010-1d522a7b-fc5f-4a62-adf3-ac3e24d4cfe3.png)
+
 
 ## Interpretation Results
   
