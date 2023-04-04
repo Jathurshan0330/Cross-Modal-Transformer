@@ -38,7 +38,7 @@ pip install -r requirements.txt
 
 Kindly refer to [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1hs6V6doKpqlLlPOsnKllZp9ATuA9VqA7?usp=sharing) to extract dataset to train the models.
 
-## Inference Script
+## Inference and Get Interpretations
 
 Kindly refer to [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1cBDzzzwdyBp-bpxR_wvVzVlxrbSwrbiG?usp=sharing) to get prediction for any subject in sleepedf dataset and get interpretation results as given in the paper.
 
@@ -73,7 +73,7 @@ Evaluate Sequence Cross-Modal Transformer
 python cmt_evaluate.py --project_path "./results/<give project name>" --data_path "path/to/dataset" --val_data_list <validation fold as a list==> ex:[4]> --model_type "Seq" --batch_size 1
 ```
 
-### Get Interpretations
+### Get Results
 
 The interpretation plots will be save under "./results/<give project name>/interpretations/<Data no>"
 ```
