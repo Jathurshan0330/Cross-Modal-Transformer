@@ -38,6 +38,10 @@ pip install -r requirements.txt
 
 Kindly refer to [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1hs6V6doKpqlLlPOsnKllZp9ATuA9VqA7?usp=sharing) to extract dataset to train the models.
 
+## Inference Script
+
+Kindly refer to [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1cBDzzzwdyBp-bpxR_wvVzVlxrbSwrbiG?usp=sharing) to get prediction for any subject in sleepedf dataset and get interpretation results as given in the paper.
+
 
 ## Train Cross-Modal Transformers
 
