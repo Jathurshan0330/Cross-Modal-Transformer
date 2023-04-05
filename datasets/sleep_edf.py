@@ -236,11 +236,7 @@ class SleepEDF_Seq_MultiChan_Dataset_Main(Dataset):
               self.mean_eog = np.concatenate((self.mean_eog, read_h5py(mean_eog_l[i])),axis = 0)
               self.sd_eog = np.concatenate((self.sd_eog, read_h5py(sd_eog_l[i])),axis = 0)
               
-          if data_type == 'train':   # Removing wake epochs
-            self.mean_eeg = np.delete(self.mean_eeg,obj = wake,axis = 0)
-            self.sd_eeg = np.delete(self.sd_eeg,obj = wake,axis = 0)
-            self.mean_eog = np.delete(self.mean_eog,obj = wake,axis = 0)
-            self.sd_eog = np.delete(self.sd_eog,obj = wake,axis = 0)
+#           
           
           print(f"Shapes of Mean  : EEG: {self.mean_eeg.shape}, EOG : {self.mean_eog.shape}")#, EMG : {self.mean_eeg2.shape}")
           print(f"Shapes of Sd  : EEG: {self.sd_eeg.shape}, EOG : {self.sd_eog.shape}")#, EMG : {self.sd_eeg2.shape}")
