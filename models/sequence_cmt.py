@@ -102,7 +102,7 @@ class Epoch_Cross_Transformer(nn.Module):
 #             return out
             
 # Sequence CMT for 15 epochs per sequence
-class Seq15_Cross_Transformer_Network(nn.Module):
+class Seq_Cross_Transformer_Network(nn.Module):
     def __init__(self,d_model = 128, dim_feedforward=512,window_size = 25): #  filt_ch = 4
         super(Seq_Cross_Transformer_Network, self).__init__()
         
