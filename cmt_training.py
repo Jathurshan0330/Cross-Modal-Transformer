@@ -44,7 +44,7 @@ def parse_option():
     parser.add_argument('--d_model', type=int, default = 128,  help='Embedding size of the CMT')
     parser.add_argument('--dim_feedforward', type=int, default = 512,  help='No of neurons feed forward block')
     parser.add_argument('--window_size', type=int, default = 50,  help='Size of non-overlapping window')
-    parser.add_argument('--num_seq', type=int, default = 5,  help='Number of epochs in a PSG sequence')
+    parser.add_argument('--num_seq', type=int, default = 15,  help='Number of epochs in a PSG sequence')
     #training parameters
     parser.add_argument('--batch_size', type=int, default = 32 ,  help='Batch Size')
     
