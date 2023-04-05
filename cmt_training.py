@@ -22,7 +22,8 @@ print(f"Torch Version : {torch.__version__}")
 
 from datasets.sleep_edf import split_data, SleepEDF_MultiChan_Dataset, get_dataset
 from models.epoch_cmt import Epoch_Cross_Transformer_Network,train_epoch_cmt
-from models.sequence_cmt import Seq_Cross_Transformer_Network, train_seq_cmt 
+from models.sequence_cmt import Seq15_Cross_Transformer_Network as Seq_Cross_Transformer_Network
+from models.sequence_cmt import train_seq_cmt 
 from utils.metrics import accuracy, kappa, g_mean, plot_confusion_matrix, confusion_matrix, AverageMeter 
 
 
@@ -40,8 +41,8 @@ def parse_option():
 
     #model parameters
     parser.add_argument('--model_type', type=str, default = 'Epoch'  ,choices=['Epoch', 'Seq'],  help='Model type')
-    parser.add_argument('--d_model', type=int, default = 256,  help='Embedding size of the CMT')
-    parser.add_argument('--dim_feedforward', type=int, default = 1024,  help='No of neurons feed forward block')
+    parser.add_argument('--d_model', type=int, default = 128,  help='Embedding size of the CMT')
+    parser.add_argument('--dim_feedforward', type=int, default = 512,  help='No of neurons feed forward block')
     parser.add_argument('--window_size', type=int, default = 50,  help='Size of non-overlapping window')
     parser.add_argument('--num_seq', type=int, default = 5,  help='Number of epochs in a PSG sequence')
     #training parameters
