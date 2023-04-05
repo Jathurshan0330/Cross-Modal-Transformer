@@ -40,7 +40,7 @@ def parse_option():
 
     #model parameters
     parser.add_argument('--model_type', type=str, default = 'Epoch'  ,choices=['Epoch', 'Seq'],  help='Model type')
-    parser.add_argument('--num_seq', type=int, default = 5,  help='Number of epochs in a PSG sequence')
+    parser.add_argument('--num_seq', type=int, default = 15,  help='Number of epochs in a PSG sequence')
     parser.add_argument('--batch_size', type=int, default = 32 ,  help='Batch Size')
     
     opt = parser.parse_args()
