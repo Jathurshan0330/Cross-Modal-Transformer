@@ -50,56 +50,56 @@ class Epoch_Cross_Transformer(nn.Module):
         return cross_cls,feat_list
     
     
-class Seq_Cross_Transformer_Network(nn.Module):
-    def __init__(self,d_model = 64, dim_feedforward=512,window_size = 25): #  filt_ch = 4
-        super(Seq_Cross_Transformer_Network, self).__init__()
+# class Seq_Cross_Transformer_Network(nn.Module):
+#     def __init__(self,d_model = 64, dim_feedforward=512,window_size = 25): #  filt_ch = 4
+#         super(Seq_Cross_Transformer_Network, self).__init__()
         
-        self.epoch_1 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
-                                                window_size = window_size)
-        self.epoch_2 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
-                                                window_size = window_size)
-        self.epoch_3 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
-                                                window_size = window_size)
-        self.epoch_4 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
-                                                window_size = window_size)
-        self.epoch_5 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
-                                                window_size = window_size)
+#         self.epoch_1 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
+#                                                 window_size = window_size)
+#         self.epoch_2 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
+#                                                 window_size = window_size)
+#         self.epoch_3 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
+#                                                 window_size = window_size)
+#         self.epoch_4 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
+#                                                 window_size = window_size)
+#         self.epoch_5 = Epoch_Cross_Transformer(d_model = d_model, dim_feedforward=dim_feedforward,
+#                                                 window_size = window_size)
         
-        self.seq_atten = Intra_modal_atten(d_model=d_model, nhead=8, dropout=0.1, 
-                                            window_size =window_size, First = False )
+#         self.seq_atten = Intra_modal_atten(d_model=d_model, nhead=8, dropout=0.1, 
+#                                             window_size =window_size, First = False )
 
-        self.ff_net = Feed_forward(d_model = d_model,dropout=0.1,dim_feedforward = dim_feedforward)
+#         self.ff_net = Feed_forward(d_model = d_model,dropout=0.1,dim_feedforward = dim_feedforward)
 
 
-        self.mlp_1    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))  ##################
-        self.mlp_2    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))
-        self.mlp_3    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))
-        self.mlp_4    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))
-        self.mlp_5    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))   
-        # 
+#         self.mlp_1    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))  ##################
+#         self.mlp_2    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))
+#         self.mlp_3    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))
+#         self.mlp_4    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))
+#         self.mlp_5    = nn.Sequential(nn.Flatten(),nn.Linear(d_model,5))   
+#         # 
 
-    def forward(self, eeg: Tensor,eog: Tensor,num_seg = 5,is_eval = False): 
-        epoch_1,feat_1 = self.epoch_1(eeg[:,:,0,:],eog[:,:,0,:])
-        epoch_2,feat_2 = self.epoch_2(eeg[:,:,1,:],eog[:,:,1,:])
-        epoch_3,feat_3 = self.epoch_3(eeg[:,:,2,:],eog[:,:,2,:])
-        epoch_4,feat_4 = self.epoch_4(eeg[:,:,3,:],eog[:,:,3,:])
-        epoch_5,feat_5 = self.epoch_5(eeg[:,:,4,:],eog[:,:,4,:])
+#     def forward(self, eeg: Tensor,eog: Tensor,num_seg = 5,is_eval = False): 
+#         epoch_1,feat_1 = self.epoch_1(eeg[:,:,0,:],eog[:,:,0,:])
+#         epoch_2,feat_2 = self.epoch_2(eeg[:,:,1,:],eog[:,:,1,:])
+#         epoch_3,feat_3 = self.epoch_3(eeg[:,:,2,:],eog[:,:,2,:])
+#         epoch_4,feat_4 = self.epoch_4(eeg[:,:,3,:],eog[:,:,3,:])
+#         epoch_5,feat_5 = self.epoch_5(eeg[:,:,4,:],eog[:,:,4,:])
 
-        seq =  torch.cat([epoch_1, epoch_2,epoch_3,epoch_4,epoch_5], dim=1)
-        seq = self.seq_atten(seq)
-        seq = self.ff_net(seq)
-        out_1 = self.mlp_1(seq[:,0,:])
-        out_2 = self.mlp_2(seq[:,1,:])
-        out_3 = self.mlp_3(seq[:,2,:])
-        out_4 = self.mlp_4(seq[:,3,:])
-        out_5 = self.mlp_5(seq[:,4,:])
+#         seq =  torch.cat([epoch_1, epoch_2,epoch_3,epoch_4,epoch_5], dim=1)
+#         seq = self.seq_atten(seq)
+#         seq = self.ff_net(seq)
+#         out_1 = self.mlp_1(seq[:,0,:])
+#         out_2 = self.mlp_2(seq[:,1,:])
+#         out_3 = self.mlp_3(seq[:,2,:])
+#         out_4 = self.mlp_4(seq[:,3,:])
+#         out_5 = self.mlp_5(seq[:,4,:])
 
-        out = [out_1,out_2,out_3,out_4,out_5]
-        Feats = [feat_1,feat_2,feat_3,feat_4,feat_5]
-        if is_eval:
-            return out,seq,Feats
-        else:
-            return out
+#         out = [out_1,out_2,out_3,out_4,out_5]
+#         Feats = [feat_1,feat_2,feat_3,feat_4,feat_5]
+#         if is_eval:
+#             return out,seq,Feats
+#         else:
+#             return out
             
 # Sequence CMT for 15 epochs per sequence
 class Seq15_Cross_Transformer_Network(nn.Module):
@@ -325,7 +325,7 @@ def train_seq_cmt(Net, train_data_loader, val_data_loader, criterion,optimizer, 
             cur_batch_size = len(eeg)
             optimizer.zero_grad()
 
-            outputs = Net(eeg.float().to(device), eog.float().to(device))
+            outputs,_ = Net(eeg.float().to(device), eog.float().to(device))
 
             loss = 0
             for ep in range(args.num_seq):
@@ -381,7 +381,7 @@ def train_seq_cmt(Net, train_data_loader, val_data_loader, criterion,optimizer, 
           for batch_val_idx, data_val in enumerate(val_data_loader):
             val_eeg,val_eog, val_labels = data_val
             cur_val_batch_size = len(val_eeg)
-            pred = Net(val_eeg.float().to(device), val_eog.float().to(device))
+            pred,_ = Net(val_eeg.float().to(device), val_eog.float().to(device))
 
             for ep in range(args.num_seq):
                   val_loss += criterion(pred[ep].cpu(), val_labels[:,ep])
@@ -527,7 +527,8 @@ def eval_seq_cmt(data_loader, device, args):
                 print("=",end = "")
                 time.sleep(0.2)
             val_eeg,val_eog, val_labels = data_val
-            pred,seq,feat_list = test_model(val_eeg.float().to(device), val_eog.float().to(device),is_eval = True)
+#             pred,seq,feat_list = test_model(val_eeg.float().to(device), val_eog.float().to(device),is_eval = True)
+            pred,feat_list = test_model(val_eeg.float().to(device), val_eog.float().to(device))#,is_eval = True)
             labels_val_main[batch_val_idx:batch_val_idx+args.num_seq] += val_labels.squeeze().unsqueeze(dim=1)
             for ep in range(args.num_seq):
                 pred_val_main[batch_val_idx+ep] += m(pred[ep]).cpu() 
