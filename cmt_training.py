@@ -22,7 +22,7 @@ print(f"Torch Version : {torch.__version__}")
 
 from datasets.sleep_edf import split_data, SleepEDF_MultiChan_Dataset, get_dataset
 from models.epoch_cmt import Epoch_Cross_Transformer_Network,train_epoch_cmt
-from models.sequence_cmt import Seq15_Cross_Transformer_Network as Seq_Cross_Transformer_Network
+from models.sequence_cmt import Seq_Cross_Transformer_Network #as Seq_Cross_Transformer_Network
 from models.sequence_cmt import train_seq_cmt 
 from utils.metrics import accuracy, kappa, g_mean, plot_confusion_matrix, confusion_matrix, AverageMeter 
 
