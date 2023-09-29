@@ -287,7 +287,7 @@ def main():
   # ==============================================================>
 
 
-  eog1, labels_1, len_1, eog_m1, eog_std1= signal_extract(sub_1, days, channel = 'eeg1', filter = True, freq = [0.2,40])
+  eog1, labels_1, len_1, eog_m1, eog_std1= signal_extract(sub_1, days, channel = 'eog', filter = True, freq = [0.2,40])
   print(f"Train data shape : {eog1.shape}, Train label shape : {labels_1.shape}")
 
   #### Save data as .h5. ######
@@ -303,7 +303,7 @@ def main():
   hf.close()
 
 
-  eog2, labels_2, len_2, eog_m2, eog_std2 =  signal_extract(sub_2, days, channel = 'eeg1', filter = True, freq = [0.2,40])
+  eog2, labels_2, len_2, eog_m2, eog_std2 =  signal_extract(sub_2, days, channel = 'eog', filter = True, freq = [0.2,40])
   print(f"Train data shape : {eog2.shape}, Train label shape : {labels_2.shape}")
 
   #### Save data as .h5. ######
@@ -319,7 +319,7 @@ def main():
   hf.close()
 
 
-  eog3, labels_3, len_3, eog_m3, eog_std3 =  signal_extract(sub_3, days, channel = 'eeg1', filter = True, freq = [0.2,40])
+  eog3, labels_3, len_3, eog_m3, eog_std3 =  signal_extract(sub_3, days, channel = 'eog', filter = True, freq = [0.2,40])
   print(f"Train data shape : {eog3.shape}, Train label shape : {labels_3.shape}")
 
   #### Save data as .h5. ######
@@ -335,7 +335,7 @@ def main():
 
 
 
-  eog4, labels_4, len_4, eog_m4, eog_std4  =  signal_extract(sub_4, days, channel = 'eeg1', filter = True, freq = [0.2,40])
+  eog4, labels_4, len_4, eog_m4, eog_std4  =  signal_extract(sub_4, days, channel = 'eog', filter = True, freq = [0.2,40])
   print(f"Train data shape : {eog4.shape}, Train label shape : {labels_4.shape}")
 
   #### Save data as .h5. ######
@@ -351,7 +351,7 @@ def main():
 
 
 
-  eog5, labels_5, len_5, eog_m5, eog_std5  =  signal_extract(sub_5, days, channel = 'eeg1', filter = True, freq = [0.2,40])
+  eog5, labels_5, len_5, eog_m5, eog_std5  =  signal_extract(sub_5, days, channel = 'eog', filter = True, freq = [0.2,40])
   print(f"Train data shape : {eeg1_5.shape}, Train label shape : {labels_5.shape}")
 
   #### Save data as .h5. ######
