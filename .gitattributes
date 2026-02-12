@@ -1,0 +1,2 @@
+# Disable all JSON from counting toward language stats
+*.json linguist-detectable=false
